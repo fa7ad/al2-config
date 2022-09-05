@@ -1,17 +1,26 @@
 #!/usr/bin/bash
 
-$SCRIPT=$(pwd)
+SCRIPT="$(pwd)"
 
-cd /etc/yum.repos.d/
-sudo wget https://download.opensuse.org/repositories/shells:fish:release:4/CentOS_7/shells:fish:release:3.repo
-
+if [ ! -f /etc/yum.repos.d/shells:fish:release:3.repo ]; then
+  cd /etc/yum.repos.d/
+  sudo wget https://download.opensuse.org/repositories/shells:fish:release:4/CentOS_7/shells:fish:release:3.repo
+fi
 sudo yum install fish git fortune-mod rsync
 
-curl -L https://bit.ly/n-install | bash -s -- -y lts
 
-curl -sS https://starship.rs/install.sh | sh
+if [ ! -d $HOME/n ]; then
+  curl -L https://bit.ly/n-install | bash -s -- -y lts
+fi
 
-cat <<'EOF' > $HOME/.config/fish/config.fish
+if [ -z "$(which starship)" ]; then
+  curl -sS https://starship.rs/install.sh | sh
+fi
+
+read -p "Replace fish config [y/N]? " -n 1 -r
+echo    # move to a new line
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+  cat <<'EOF' > $HOME/.config/fish/config.fish
 set cwd (dirname (status -f))
 
 # load env
@@ -44,7 +53,11 @@ bind \cl clear_prompt
 set -x N_PREFIX "$HOME/n"; contains $N_PREFIX $PATH; or set -a PATH $N_PREFIX
 EOF
 
-curl https://raw.githubusercontent.com/oh-my-fish/oh-my-fish/master/bin/install | fish
+fi
+
+if [ ! -d $HOME/.config/omf ]; then
+  curl https://raw.githubusercontent.com/oh-my-fish/oh-my-fish/master/bin/install | fish
+fi
 
 cat <<'EOF' > $HOME/.config/omf/bundle
 package bang-bang
