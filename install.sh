@@ -57,6 +57,7 @@ EOF
 fi
 
 rsync $SCRIPT/fish/ $HOME/ -avhP
+rsync $SCRIPT/nvim/ $HOME/ -avhP
 
 if [ ! -d $HOME/.config/omf ]; then
     curl https://raw.githubusercontent.com/oh-my-fish/oh-my-fish/master/bin/install | fish
